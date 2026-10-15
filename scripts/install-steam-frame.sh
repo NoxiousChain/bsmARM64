@@ -17,7 +17,7 @@
 # Environment: BSM_REPO (default DaVarga/bs-manager).
 set -euo pipefail
 
-REPO=${BSM_REPO:-DaVarga/bs-manager}
+REPO=${BSM_REPO:-NoxiousChain/bsmARM64}
 APP_DIR=$HOME/Applications
 APPIMAGE=$APP_DIR/BSManager.AppImage
 DESKTOP_DIR=${XDG_DATA_HOME:-$HOME/.local/share}/applications
