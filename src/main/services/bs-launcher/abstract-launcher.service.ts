@@ -4,7 +4,7 @@ import { ChildProcess, SpawnOptions } from "node:child_process";
 import path from "node:path";
 import log from "electron-log";
 import { LinuxService } from "../linux.service";
-import { BsmShellLog, bsmSpawn, BSM_LAUNCH_TOKEN_ENV, getProcessesByName, ProcessDetails } from "main/helpers/os.helpers";
+import { BsmShellLog, bsmSpawn, BSM_LAUNCH_TOKEN_ENV, getLinuxProcessStartMarker, getProcessesByName, ProcessDetails } from "main/helpers/os.helpers";
 import { BS_EXECUTABLE, IS_FLATPAK } from "main/constants";
 import { LaunchMods } from "shared/models/bs-launch/launch-option.interface";
 import { app } from "electron";
@@ -416,6 +416,9 @@ export abstract class AbstractLauncherService {
         ownedProcess: OwnedProcessIdentity,
         signal?: AbortSignal
     ): Promise<boolean> {
+        if (process.platform === "linux" && !IS_FLATPAK && ownedProcess.startMarker !== undefined) {
+            return this.waitForLinuxProcessExit(ownedProcess, signal);
+        }
         while (!signal?.aborted) {
             const processes = await this.getProcessesWithRetry(BS_EXECUTABLE, signal);
             if (!processes.some(processDetails => this.processMatchesOwnedIdentity(
@@ -423,6 +426,21 @@ export abstract class AbstractLauncherService {
                 executablePath,
                 ownedProcess
             ))) {
+                return true;
+            }
+            if (!(await abortableDelay(OWNED_PROCESS_EXIT_POLL_INTERVAL_MS, signal))) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    // While the game runs, listing every process each second (ps-list and /bin/ps both spawn ps)
+    // takes CPU time from the game, which on the Steam Frame causes hitches. Reading the game's own
+    // /proc/<pid>/stat is enough: the start marker changes if the pid is reused.
+    private async waitForLinuxProcessExit(ownedProcess: OwnedProcessIdentity, signal?: AbortSignal): Promise<boolean> {
+        while (!signal?.aborted) {
+            if (await getLinuxProcessStartMarker(ownedProcess.pid) !== ownedProcess.startMarker) {
                 return true;
             }
             if (!(await abortableDelay(OWNED_PROCESS_EXIT_POLL_INTERVAL_MS, signal))) {
