@@ -242,7 +242,7 @@ async function getLinuxProcessMetadata(processIds: number[]): Promise<Map<number
     return metadata;
 }
 
-async function getLinuxProcessStartMarker(processId: number): Promise<string | undefined> {
+export async function getLinuxProcessStartMarker(processId: number): Promise<string | undefined> {
     try {
         const stat = await readFile(`/proc/${processId}/stat`, "utf8");
         const fieldsAfterName = stat.slice(stat.lastIndexOf(")") + 2).trim().split(/\s+/);
