@@ -1,11 +1,29 @@
 <a name="readme-top"></a>
 
 > [!NOTE]
-> **Steam Frame fork.** This fork runs on ARM64 SteamOS and adds an **ARM64 tab** that installs a
+> **Steam Frame fork, with smoother gameplay.** This fork runs on ARM64 SteamOS and adds an **ARM64 tab** that installs a
 > native ARM64 build of Beat Saber 1.40.9 through 1.44.1 ([bs-arm64](https://github.com/DaVarga/bs-arm64)).
-> **[How to install on the Steam Frame](docs/steam-frame.md)**
+> While you play, BSManager no longer scans every process each second, so it takes less CPU time away from the game.
 >
-> Unofficial; the original project is [Zagrios/bs-manager](https://github.com/Zagrios/bs-manager).
+> Unofficial. Based on [DaVarga/bs-manager](https://github.com/DaVarga/bs-manager); the original project is [Zagrios/bs-manager](https://github.com/Zagrios/bs-manager).
+
+## Install on the Steam Frame
+
+On the Frame, open **Konsole** (VR dashboard → **+** → Konsole), or connect over SSH, and run:
+
+```sh
+curl -fsSL https://github.com/NoxiousChain/bsmARM64/releases/latest/download/install.sh | bash
+```
+
+When it prints `done`, start **BSManager** from the **Launch program** list. Run the same command again to update.
+
+To uninstall (your versions, maps and settings in `~/.local/share/BSManager` are kept):
+
+```sh
+curl -fsSL https://github.com/NoxiousChain/bsmARM64/releases/latest/download/install.sh | bash -s -- --uninstall
+```
+
+More details (Proton setup, the ARM64 tab, foveated rendering): **[Steam Frame guide](docs/steam-frame.md)**.
 
 <!-- PROJECT SHIELDS -->
 <!--
